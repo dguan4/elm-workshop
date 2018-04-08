@@ -70,10 +70,12 @@ view model =
             [ class "search-query"
 
             -- TODO onInput, set the query in the model
+            , onInput SetQuery
             , defaultValue model.query
             ]
             []
         , button [ class "search-button" ] [ text "Search" ]
+        , p [] [ text model.query ]
         , ul [ class "results" ] (List.map viewSearchResult model.results)
         ]
 
@@ -86,7 +88,7 @@ viewSearchResult result =
             [ text result.name ]
         , button
             -- TODO add an onClick handler that sends a DeleteById msg
-            [ class "hide-result" ]
+            [ class "hide-result", onClick (DeleteById result.id) ]
             [ text "X" ]
         ]
 
@@ -95,7 +97,12 @@ update : Msg -> Model -> Model
 update msg model =
     -- TODO if we get a SetQuery msg, use it to set the model's query field,
     -- and if we get a DeleteById msg, delete the appropriate result
-    model
+    case msg of
+        SetQuery msg ->
+            { model | query = msg }
+
+        DeleteById id ->
+            { model | results = List.filter (\result -> result.id /= id) model.results }
 
 
 main : Program Never Model Msg
